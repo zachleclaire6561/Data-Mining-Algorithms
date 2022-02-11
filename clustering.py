@@ -20,7 +20,7 @@ class clustering:
     '''
 
     @staticmethod
-    def k_mediods_general(k, D, tau, distance):
+    def k_mediods(k, D, tau, distance):
         if(k < 1 or tau < 0 or not clustering.is_normal_arr(D)):
             print("Invalid Inputs")
 
@@ -63,7 +63,7 @@ class clustering:
                 min_index = 0
                 for j in range(1,k):
                     dist = distance(D[i], D[Identity_center[j]])
-                    if(dist < min):
+                    if(dist < min): 
                         min_index = j
                 Identity[i] = min_index
 
@@ -80,8 +80,10 @@ class clustering:
         return Identity
 
     @staticmethod
-    def k_mediods(k, D, tau):
-        clustering.k_mediods_general(k, D, tau, clustering.euclidian_distance)
+    def k_mediods_wrapper(k, X, tau):
+        #take the gram matrix, aka the distance matrix
+        D = X.transpose() * X
+        clustering.k_mediods_general(k, D, tau)
     
     @staticmethod
     def k_means(k, D, tau):
