@@ -15,12 +15,10 @@ class clustering:
     k: number of clusters
     tau: tolerance for Clustering (don't set too low)
     D: Data matrix as numpy array. Assume shape: (n, m)
-    n = number of vectors
-    m = number of elements in vectors
     '''
 
     @staticmethod
-    def k_mediods(k, D, tau, distance):
+    def k_mediods(k, D, tau):
         if(k < 1 or tau < 0 or not clustering.is_normal_arr(D)):
             print("Invalid Inputs")
 
@@ -29,65 +27,73 @@ class clustering:
         MAX_THRESH = 1000
         n = D.shape[0]
         m = D.shape[1]
-        k=10
-        tigtness_current = float("inf")
+
+        tigtness_current = 0
         tightness_last = 0
+        delta_Q = float("inf")
         time = 0
-        Identity = np.zeros((1,n)) # each index has value \in {1...k}
+        Identity = np.random.randint(0, high=k, size=n) # each index has value \in {1...k}
         Identity_center = np.random.choice(n, k, replace=False)  # each index maps to index of means in Indetity
         
         #q_array = np.zeros(1,int(n))
-        while(tigtness_current - tightness_last > tau or time > MAX_THRESH):
+        while(abs(delta_Q) > tau or time > MAX_THRESH):
             #first, we update the charertistic vectors
-            for k in range(1, k):
+            for k in range(0, k):
                 #select indices in cluster k
-                indices_k = np.where(np.any(Identity == k, axis=1))
-                
-                #tuples are a curse and a blessing
-                k_count = indices_k[0].shape[0]
+                indices_k = []
+                for i in range(0, D.shape[0]):
+                    if(Identity[i] == k):
+                        indices_k.append(i)
+                k_count = len(indices_k)
                 center_dist = float("inf")
-                center_index = -1
-                #calculate distances
-                for i in range(1,k_count):
+                center_index = 0
+                #calculate total distances
+                for i in range(0,k_count):
                     total_dist = 0
-                    for j in range(1,k_count):
-                        total_dist += distance(D[indices_k[i]], D[indices_k[j]])
+                    for j in range(0,k_count):
+                        total_dist += D[indices_k[i],indices_k[j]]
                     if(total_dist < center_dist):
                         center_index = i
-                print(indices_k, center_index)
                 Identity_center[k] = indices_k[center_index]
+                
 
             #second, assign each vector into a clustering
             for i in range(1, n):
                 min = float("inf")
                 min_index = 0
-                for j in range(1,k):
-                    dist = distance(D[i], D[Identity_center[j]])
-                    if(dist < min): 
+
+                for j in range(0,k):
+                    dist = D[i, Identity_center[k]]
+                    if(dist < min):
+                        min = dist
                         min_index = j
                 Identity[i] = min_index
 
             #update tightness
-            tigtness_last = tigtness_current
             tigtness_current = 0
-
             for i in range(1, n):
-                tigtness_current += distance(D[i], D[Identity_center[Identity[i]]])**2
-            
+                tigtness_current += D[i, Identity_center[Identity[i]]]**2
+            delta_Q = tigtness_current - tightness_last
+            tightness_last = tigtness_current
             #update time step
             time += 1
+            print(time, delta_Q)
         
         return Identity
 
     @staticmethod
-    def k_mediods_wrapper(k, X, tau):
-        #take the gram matrix, aka the distance matrix
-        D = X.transpose() * X
-        clustering.k_mediods_general(k, D, tau)
+    def k_mediods_wrapper(k, X, tau, distance):
+        #find distance matrix
+        D = np.zeros((X.shape[0], X.shape[0]))
+        for i in range(0, X.shape[0]):
+            for j in range(0, X.shape[0]):
+                # itterate through each combination of vectors to construct matrix
+                D[i,j] = distance(X[i], X[j])
+        return clustering.k_mediods(k, D, tau)
     
     @staticmethod
-    def k_means(k, D, tau):
-        clustering.k_mediods_general(k, D, tau, clustering.euclidian_distance)
+    def k_means(k, X, tau):
+        print("MeMe")
 
 
     @staticmethod
