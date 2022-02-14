@@ -18,13 +18,13 @@ class clustering:
     '''
 
     @staticmethod
-    def k_mediods(k, D, tau):
-        if(k < 1 or tau < 0 or not clustering.is_normal_arr(D)):
+    def k_mediods(cluster_count, D, tau):
+        if(cluster_count < 1 or tau < 0 or not clustering.is_normal_arr(D)):
             print("Invalid Inputs")
 
         #initialization:
         #number of vectors
-        MAX_THRESH = 1000
+        MAX_THRESH = 10
         n = D.shape[0]
         m = D.shape[1]
 
@@ -32,43 +32,51 @@ class clustering:
         tightness_last = 0
         delta_Q = float("inf")
         time = 0
-        Identity = np.random.randint(0, high=k, size=n) # each index has value \in {1...k}
-        Identity_center = np.random.choice(n, k, replace=False)  # each index maps to index of means in Indetity
+        Identity = np.random.randint(cluster_count, size=n) # each index has value \in {1...k}
+        Identity_center = np.random.choice(n, cluster_count, replace=False)  # each index maps to index of means in Indetity
         
         #q_array = np.zeros(1,int(n))
-        while(abs(delta_Q) > tau or time > MAX_THRESH):
-            #first, we update the charertistic vectors
-            for k in range(0, k):
+        while(abs(delta_Q) > tau and time < MAX_THRESH):
+            #first, we update the cluster centers
+            for k in range(0, cluster_count):
                 #select indices in cluster k
                 indices_k = []
-                for i in range(0, D.shape[0]):
-                    if(Identity[i] == k):
+                for i in range(0, n):
+                    if(Identity[i] == cluster_count):
                         indices_k.append(i)
                 k_count = len(indices_k)
-                center_dist = float("inf")
-                center_index = 0
-                #calculate total distances
-                for i in range(0,k_count):
-                    total_dist = 0
-                    for j in range(0,k_count):
-                        total_dist += D[indices_k[i],indices_k[j]]
-                    if(total_dist < center_dist):
-                        center_index = i
-                Identity_center[k] = indices_k[center_index]
-                
+                if(k_count > 0):
+                    # center of the data
+                    center_dist = float("inf")
+                    center_index = 0
+                    #calculate total distances
+                    for i in range(0,k_count):
+                        total_dist = 0
+                        for j in range(0,k_count):
+                            total_dist += D[indices_k[i],indices_k[j]]
+                        if(total_dist < center_dist):
+                            center_index = i
+                            center_dist = total_dist
+                    #print(k, indices_k)
+                    #print(f"Indices: {len(indices_k)} Identity_center: {Identity_center.shape} k: {k} center: {center_index}")
+                    Identity_center[k] = indices_k[center_index]
+            #print(Identity_center)
+
 
             #second, assign each vector into a clustering
-            for i in range(1, n):
+            for i in range(0, n):
                 min = float("inf")
-                min_index = 0
-
-                for j in range(0,k):
-                    dist = D[i, Identity_center[k]]
-                    if(dist < min):
+                min_index = -1
+                for j in range(0, cluster_count):
+                    dist = D[i, Identity_center[j]]
+                    print(j, dist)
+                    if dist < min:
                         min = dist
                         min_index = j
+                print(min_index)
                 Identity[i] = min_index
-
+            print(Identity)
+            
             #update tightness
             tigtness_current = 0
             for i in range(1, n):
@@ -89,6 +97,7 @@ class clustering:
             for j in range(0, X.shape[0]):
                 # itterate through each combination of vectors to construct matrix
                 D[i,j] = distance(X[i], X[j])
+        #np.savetxt("dist.csv", D, delimiter=",")
         return clustering.k_mediods(k, D, tau)
     
     @staticmethod
