@@ -175,3 +175,19 @@ class clustering:
     @staticmethod
     def random_distance(x1,x2):
         return math.random()
+
+    @staticmethod
+    def voting_distance(x1, x2):
+        diff = 0 #number of diff votes
+        count = 0 #number of votes
+        is_never_together = True
+        for a,b in zip(x1, x2):
+            count += 1
+            if(a!=0 and b!= 0):
+                is_never_together = False
+                if(a!=b):
+                    diff += 1
+        if is_never_together:
+            return 0.5
+        else:
+            return diff/count
