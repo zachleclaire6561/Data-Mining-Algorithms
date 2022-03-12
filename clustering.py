@@ -134,7 +134,7 @@ class clustering:
                 min = float("inf")
                 min_index = -1
                 for j in range(0, cluster_count):
-                    dist = clustering.euclidian_distance(X[i], char_vecs[j])
+                    dist = clustering.euclidian_distance(X[i], char_vecs[j])**2
                     #print(j, dist)
                     if dist < min:
                         min = dist
