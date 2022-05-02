@@ -8,8 +8,6 @@ import numpy as np
 class Node:
 
     def __init__(self, x_elements, y_elements, values, x_min, x_max, y_min, y_max):
-        self.left = None
-        self.right = None
         self.x_elements = x_elements
         self.y_elements = y_elements
         self.vals = values
@@ -17,6 +15,14 @@ class Node:
         self.x_max = x_max
         self.y_min = y_min
         self.y_max = y_max
+    
+    def print_me(self):
+        #print(self.x_elements)
+        #print(self.y_elements)
+        print(f"x:({self.x_min}, {self.x_max}); y:({self.y_min}, {self.y_max})")
+        #print(self.vals)
+
+
 
 
 '''
