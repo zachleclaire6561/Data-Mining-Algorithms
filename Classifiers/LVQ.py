@@ -11,7 +11,8 @@ class LVQ:
     
 
     #fields:
-    prototypes: np.ndarray
+    proto_set1 : np.ndarray
+    proto_set2 : np.ndarray
 
     '''
     Module for analyzing data using a self organizing map.
@@ -27,18 +28,18 @@ class LVQ:
     alpha0: initial learning rate
     gamma0: initial coupling constant
     '''
-    def train(X1, X2, PROTO_COUNT, T_MAX, distance, sample_func, alpha0, gamma0):
-
-        #get center of data
-        avg = np.zeros((1,X[0].shape[0]))
-        total = 0
-        #take sum of all vectors
-        for x in X:
-            avg += x
-            total += 1
-        #compute average
-        avg = avg * 1/total
-        LVQ.prototypes = np.tile(avg, (PROTO_COUNT, 1) ) + (0.5*np.ones((PROTO_COUNT, X[0].shape[0])) - np.random.rand(PROTO_COUNT, X[0].shape[0]))
+    def train(X, PROTO_COUNT, T_MAX, distance, sample_func, alpha0, gamma0):
+        for X in X_Set:
+            #get center of data
+            avg = np.zeros((1,X[0].shape[0]))
+            total = 0
+            #take sum of all vectors
+            for x in X:
+                avg += x
+                total += 1
+            #compute average
+            avg = avg * 1/total
+            LVQ.proto_set.append(prototypes = np.tile(avg, (PROTO_COUNT, 1) ) + (0.5*np.ones((PROTO_COUNT, X[0].shape[0])) - np.random.rand(PROTO_COUNT, X[0].shape[0])))
 
         beta = math.log(10)/T_MAX
         #Loop through t:
